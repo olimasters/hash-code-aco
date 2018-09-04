@@ -13,5 +13,6 @@ struct Ride
     Coordinate endPosition;
     unsigned earliestStart;
     unsigned latestFinish;
+    unsigned index;
 };
 #endif

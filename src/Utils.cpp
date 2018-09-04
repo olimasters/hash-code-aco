@@ -83,3 +83,10 @@ Parameters getParamsFromFile(std::string inputFilename)
     }
     return Parameters{R, C, F, N, B, T, rides};
 }
+
+void normalise(std::vector<double> &numbers)
+{
+    double sum = std::accumulate(numbers.begin(), numbers.end());
+    for(double &number : numbers)
+        number /= sum;
+}
