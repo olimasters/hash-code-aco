@@ -1,12 +1,18 @@
 #include <AntColony.h>
+#include <Ride.h>
+#include <PheremoneTrail.h>
 #include <vector>
+#include <algorithm>
 
-AntColony::AntColony(const double pheremoneWeighting, const double evaporationConstant, const unsigned colonySize, unsigned iterations, const std::vector<Ride> &ridesToComplete) :
+AntColony::AntColony(const double pheremoneWeighting, const double evaporationConstant, const unsigned colonySize, unsigned iterations, const Parameters &parameters) :
     pheremoneWeighting(pheremoneWeighting),
     evaporationConstant(evaporationConstant),
     colonySize(colonySize),
     iterations(iterations),
-    ridesToComplete(ridesToComplete)
+    ridesToComplete(parameters.allRides),
+    T(parameters.T),
+    F(parameters.F),
+    B(parameters.B)
 {
 }
 
@@ -16,7 +22,7 @@ Solution AntColony::findBestSolution()
     {
         ants.clear();
 
-        std::generate_n(std::back_inserter(ants), colonySize, [&](){return Ant(ridesToComplete, pheremoneWeighting, pheremoneMatrix)});
+        std::generate_n(std::back_inserter(ants), colonySize, [&](){return Ant(ridesToComplete, pheremoneWeighting, pheremoneMatrix, T, F, B);});
 
         for(auto &ant : ants)
             ant.walkToSolution();
@@ -34,7 +40,7 @@ void AntColony::updatePheremoneMatrix()
     {
         unsigned score = ant.getScore();
         const PheremoneTrail trail{ant.getPheremoneTrail()};
-        addTrailToMatrix(PheremoneTrail, score);
+        addTrailToMatrix(trail, score);
     }
 }
 

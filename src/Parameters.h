@@ -1,6 +1,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+#include <Ride.h>
 #include <vector>
 
 struct Parameters
@@ -21,5 +22,5 @@ struct Parameters
     unsigned B;
     unsigned T;
     std::vector<Ride> allRides;
-}
+};
 #endif
