@@ -35,7 +35,6 @@ Solution Ant::getSolution() const
 std::vector<Vehicle*> Ant::getFreeVehicles()
 {
     std::vector<Vehicle*> freeVehicles;
-    freeVehicles.reserve(fleet.size());
     for(auto it = fleet.begin(); it != fleet.end(); it++)
         if(it->isFree())
             freeVehicles.push_back(&(*it));

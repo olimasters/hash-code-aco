@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <thread>
 #include <utility>
+#include <cstdlib>
 #include <iostream>
 
 AntColony::AntColony(const double pheremoneWeighting, const double evaporationConstant, const unsigned colonySize, unsigned iterations, const Parameters &parameters) :
@@ -29,12 +30,12 @@ Ant AntColony::findBestAnt()
 
         std::generate_n(std::back_inserter(ants), colonySize, [&](){return Ant(ridesToComplete, pheremoneWeighting, pheremoneMatrix, T, F, B);});
 
-        for(auto &ant : ants)
-            ant.walkToSolution();
-        //walkAntsToSolutions();
+        // for(auto &ant : ants)
+            // ant.walkToSolution();
+        walkAntsToSolutions();
         updatePheremoneMatrix();
         // Progress indicator:
-        //std::cout << "Completed iteration " << i+1 << " of " << iterations << std::endl;
+        std::cout << "Completed iteration " << i+1 << " of " << iterations << std::endl;
     }
     // We assume that the last colony of ants will have a very good best ant by this time
     const auto bestAnt = std::max_element(ants.begin(), ants.end(), [&](const Ant &a, const Ant &b){return a.getScore() < b.getScore();});
@@ -44,8 +45,12 @@ Ant AntColony::findBestAnt()
 
 void AntColony::walkAntsToSolutions()
 {
-    unsigned numberOfThreads = std::thread::hardware_concurrency();
-    numberOfThreads = numberOfThreads ? numberOfThreads : 1;
+    const char *threadCount = std::getenv("ACO_THREAD_COUNT");
+    unsigned numberOfThreads = 4; // Defaulting to a value I found experimentally fast
+    if(threadCount != NULL)
+    {
+        numberOfThreads = std::stoi(threadCount);
+    }
     std::vector<std::pair<unsigned, unsigned>> antIndicesForEachThread{getIndexPairs(numberOfThreads, ants.size())};
     std::vector<std::thread> antWalkingThreads;
     antWalkingThreads.reserve(numberOfThreads);
