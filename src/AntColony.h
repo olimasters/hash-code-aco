@@ -15,7 +15,7 @@ class AntColony
         Ant findBestAnt();
     private:
         void walkAntsToSolutions();
-        void walkSubsetOfAnts(const std::vector<std::pair<unsigned, unsigned>> &indexPair);
+        void walkSubsetOfAnts(const std::pair<unsigned, unsigned> &indexPair);
         void updatePheremoneMatrix();
         void addTrailToMatrix(const PheremoneTrail &trail, unsigned score);
         void evaporatePheremones();

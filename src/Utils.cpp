@@ -6,6 +6,22 @@
 #include <vector>
 #include <utility>
 
+
+void printSolution(const Solution &solution)
+{
+    for(const auto &rides : solution)
+    {
+        std::cout << rides.size() << " ";
+        for(unsigned i = 0; i < rides.size(); i++)
+        {
+            std::cout << rides[i].index;
+            if(i < rides.size() - 1)
+                std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 std::vector<std::pair<unsigned, unsigned>> getIndexPairs(unsigned threads, unsigned jobs)
 {
     std::vector<std::pair<unsigned, unsigned>> results;

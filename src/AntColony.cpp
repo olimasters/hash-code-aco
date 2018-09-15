@@ -1,9 +1,11 @@
 #include <AntColony.h>
+#include <Utils.h>
 #include <Ride.h>
 #include <PheremoneTrail.h>
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include <utility>
 #include <iostream>
 
 AntColony::AntColony(const double pheremoneWeighting, const double evaporationConstant, const unsigned colonySize, unsigned iterations, const Parameters &parameters) :
@@ -27,7 +29,9 @@ Ant AntColony::findBestAnt()
 
         std::generate_n(std::back_inserter(ants), colonySize, [&](){return Ant(ridesToComplete, pheremoneWeighting, pheremoneMatrix, T, F, B);});
 
-        walkAntsToSolutions();
+        for(auto &ant : ants)
+            ant.walkToSolution();
+        //walkAntsToSolutions();
         updatePheremoneMatrix();
         // Progress indicator:
         //std::cout << "Completed iteration " << i+1 << " of " << iterations << std::endl;
@@ -46,15 +50,15 @@ void AntColony::walkAntsToSolutions()
     std::vector<std::thread> antWalkingThreads;
     antWalkingThreads.reserve(numberOfThreads);
     for(const auto &indexPair : antIndicesForEachThread)
-        antWalkingThreads.push_back(&AntColony::walkSubsetOfAnts, this, indexPair);
+        antWalkingThreads.push_back(std::thread(&AntColony::walkSubsetOfAnts, this, indexPair));
     for(auto &antWalkingThread : antWalkingThreads)
         antWalkingThread.join();
 
 }
 
-void AntColony::walkSubsetOfAnts(const std::vector<std::pair<unsigned, unsigned>> &indexPair)
+void AntColony::walkSubsetOfAnts(const std::pair<unsigned, unsigned> &indexPair)
 {
-    for(unsigned i = indexPair.first, i <= indexPair.second; i++)
+    for(unsigned i = indexPair.first; i <= indexPair.second; i++)
         ants[i].walkToSolution();
 }
 

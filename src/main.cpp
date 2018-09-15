@@ -3,16 +3,6 @@
 #include <Utils.h>
 #include <AntColony.h>
 
-void printSolution(const Solution &solution)
-{
-    for(const auto &rides : solution)
-    {
-        for(const auto &ride : rides)
-            std::cout << ride.index << " ";
-        std::cout << std::endl;
-    }
-}
-
 int main(int argc, char *argv[])
 {
     if(argc != 2)
@@ -28,8 +18,7 @@ int main(int argc, char *argv[])
     unsigned iterations = 20;
     AntColony colony(pheremoneWeighting, evaporationConstant, colonySize, iterations, parameters);
     Ant bestAnt = colony.findBestAnt();
-    //printSolution(bestAnt.getSolution());
-    //std::cout << "Score: " << bestAnt.getScore() << std::endl;
-    std::cout << bestAnt.getScore() << std::endl;
+    printSolution(bestAnt.getSolution());
+    std::cout << "Score: " << bestAnt.getScore() << std::endl;
     return 0;
 }
