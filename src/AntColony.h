@@ -12,8 +12,10 @@ class AntColony
 {
     public:
         AntColony(const double pheremoneWeighting, const double evaporationConstant, const unsigned colonySize, unsigned iterations, const Parameters &parameters);
-        Solution findBestSolution();
+        Ant findBestAnt();
     private:
+        void walkAntsToSolutions();
+        void walkSubsetOfAnts(const std::vector<std::pair<unsigned, unsigned>> &indexPair);
         void updatePheremoneMatrix();
         void addTrailToMatrix(const PheremoneTrail &trail, unsigned score);
         void evaporatePheremones();

@@ -18,7 +18,7 @@ class Ant
         unsigned getScore() const;
 
     private:
-        std::vector<Vehicle> getFreeVehicles() const;
+        std::vector<Vehicle*> getFreeVehicles();
         std::vector<Ride> getPossibleRides(const Vehicle &vehicle, const std::vector<Ride> &ridesToChooseFrom);
         Ride pickRide(const std::vector<double> &probabilitiesOfPickingRides, const std::vector<Ride> &possibleRides);
         std::vector<double> getProbabilities(const Vehicle &vehicle, const std::vector<Ride> &rideChoices) const;

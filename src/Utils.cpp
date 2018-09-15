@@ -4,6 +4,23 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <utility>
+
+std::vector<std::pair<unsigned, unsigned>> getIndexPairs(unsigned threads, unsigned jobs)
+{
+    std::vector<std::pair<unsigned, unsigned>> results;
+    unsigned jobsPerThread = jobs / threads;
+    unsigned workaholicThreads = jobs % threads;
+    for(unsigned i = 0; i < (threads - workaholicThreads) * jobsPerThread; i += jobsPerThread)
+    {
+        results.push_back(std::pair<unsigned, unsigned>{i, i + jobsPerThread - 1});
+    }
+    for(unsigned i = (threads - workaholicThreads) * jobsPerThread; i < jobs - jobsPerThread; i += jobsPerThread + 1)
+    {
+        results.push_back(std::pair<unsigned, unsigned>{i, i + jobsPerThread});
+    }
+    return results;
+}
 
 std::vector<unsigned int> getLineOfIntegers(std::istream &is)
 {
@@ -51,7 +68,7 @@ Parameters createParamsFromFile(std::string inputFilename)
         y = rideData[3];
         s = rideData[4];
         f = rideData[5];
-        rides.push_back(Ride{a, b, x, y, s, f});
+        rides.push_back(Ride{a, b, x, y, s, f, i});
     }
     return Parameters{R, C, F, N, B, T, rides};
 }
@@ -59,6 +76,10 @@ Parameters createParamsFromFile(std::string inputFilename)
 void normalise(std::vector<double> &numbers)
 {
     double sum = std::accumulate(numbers.begin(), numbers.end(), 0);
-    for(double &number : numbers)
-        number /= sum;
+    if(sum == 0)
+        for(double &number : numbers)
+            number = 1.0/numbers.size();
+    else
+        for(double &number : numbers)
+            number /= sum;
 }

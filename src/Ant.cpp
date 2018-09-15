@@ -4,6 +4,7 @@
 #include <Utils.h>
 #include <random>
 #include <algorithm>
+#include <stdexcept>
 
 Ant::Ant(const std::vector<Ride> &ridesToComplete, double pheremoneWeighting, const std::vector<std::vector<double>> &pheremoneMatrix, unsigned T, unsigned F, unsigned B) :
     T(T),
@@ -31,21 +32,32 @@ Solution Ant::getSolution() const
     return solution;
 }
 
-std::vector<Vehicle> Ant::getFreeVehicles() const
+std::vector<Vehicle*> Ant::getFreeVehicles()
 {
-    std::vector<Vehicle> freeVehicles;
-    std::copy_if(fleet.begin(), fleet.end(), std::back_inserter(freeVehicles), [](const Vehicle &vehicle){return vehicle.isFree();});
+    std::vector<Vehicle*> freeVehicles;
+    freeVehicles.reserve(fleet.size());
+    for(auto it = fleet.begin(); it != fleet.end(); it++)
+        if(it->isFree())
+            freeVehicles.push_back(&(*it));
     return freeVehicles;
 }
 
 std::vector<double> Ant::getProbabilities(const Vehicle &vehicle, const std::vector<Ride> &rideChoices) const
 {
-    unsigned indexOfPreviousRide = vehicle.getLastRide().index;
-    std::vector<double> probabilities;
-
+    std::vector<double> probabilities(rideChoices.size());
     for(unsigned i = 0; i < rideChoices.size(); ++i)
     {
-        double pheremoneQuantity = pheremoneMatrix[indexOfPreviousRide][rideChoices[i].index];
+        double pheremoneQuantity;
+        try
+        {
+            unsigned indexOfPreviousRide = vehicle.getLastRide().index;
+            pheremoneQuantity = pheremoneMatrix[indexOfPreviousRide][rideChoices[i].index];
+        }
+        catch(const std::logic_error &err)
+        {
+            pheremoneQuantity = 1; // First ride for this vehicle -- no relevant pheremone, just default it
+        }
+
         double scoreFromRide = rideChoices[i].distance() + B * vehicle.canCompleteWithBonus(rideChoices[i]);
         probabilities[i] = pheremoneQuantity * scoreFromRide;
     }
@@ -68,17 +80,17 @@ std::vector<Ride> Ant::getPossibleRides(const Vehicle &vehicle, const std::vecto
 void Ant::walkToSolution()
 {
     std::vector<Ride> remainingRides{ridesToComplete};
-    for(unsigned currentTime = 0; currentTime < T && !remainingRides.empty(); ++currentTime)
+    for(currentTime = 0; currentTime < T && !remainingRides.empty(); ++currentTime)
     {
-        std::vector<Vehicle> freeVehicles{getFreeVehicles()};
+        std::vector<Vehicle*> freeVehicles{getFreeVehicles()};
         for(auto &vehicle : freeVehicles)
         {
-            std::vector<Ride> possibleRides{getPossibleRides(vehicle, remainingRides)}; // exclude those which cannot be completed in time
+            std::vector<Ride> possibleRides{getPossibleRides(*vehicle, remainingRides)}; // exclude those which cannot be completed in time
 
             if(possibleRides.empty())
                 continue; // This vehicle's henceforth useless if we're in here -- just let it stew
 
-            std::vector<double> probabilitiesOfPickingRides{getProbabilities(vehicle, remainingRides)};
+            std::vector<double> probabilitiesOfPickingRides{getProbabilities(*vehicle, possibleRides)};
             Ride assignedRide = pickRide(probabilitiesOfPickingRides, possibleRides);
             remainingRides.erase(
                     std::remove_if(
@@ -87,13 +99,20 @@ void Ant::walkToSolution()
                         [&](const Ride &ride){return ride.index == assignedRide.index;}),
                     remainingRides.end());
 
-            pheremoneTrail.push_back(std::pair<unsigned, unsigned>{vehicle.getLastRide().index, assignedRide.index});
+            try
+            {
+                pheremoneTrail.push_back(std::pair<unsigned, unsigned>{vehicle->getLastRide().index, assignedRide.index});
+            }
+            catch(const std::logic_error &err)
+            {
+                // swallow it -- nothing else needed on the pheremone trail if it was the vehicle's first ride
+            }
 
             score += assignedRide.distance();
-            if(vehicle.canCompleteWithBonus(assignedRide))
+            if(vehicle->canCompleteWithBonus(assignedRide))
                 score += B;
 
-            vehicle.assignRide(assignedRide);
+            vehicle->assignRide(assignedRide);
         }
     }
 }

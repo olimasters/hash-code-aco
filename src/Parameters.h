@@ -8,10 +8,11 @@ struct Parameters
 {
     Parameters(unsigned R, unsigned C, unsigned F, unsigned N, unsigned B, unsigned T, std::vector<Ride> allRides) : 
     R(R),
-    C(F),
-    N(B),
-    B(R),
-    T(R),
+    C(C),
+    F(F),
+    N(N),
+    B(B),
+    T(T),
     allRides(allRides)
     {};
 
