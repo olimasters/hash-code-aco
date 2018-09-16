@@ -3,9 +3,8 @@
 #include <Coordinate.h>
 #include <stdexcept>
 
-Vehicle::Vehicle(unsigned &currentTime) :
-    currentTime(currentTime),
-    freeTime(currentTime)
+Vehicle::Vehicle() :
+    freeTime(0)
 {
 }
 
@@ -21,15 +20,15 @@ Coordinate Vehicle::getDepartureLocation() const
     return rides.empty() ? Coordinate{0,0} : getLastRide().endPosition;
 }
 
-void Vehicle::assignRide(Ride ride)
+void Vehicle::assignRide(Ride ride, const unsigned &currentTime)
 {
-    freeTime = std::min(ride.earliestStart, currentTime + dist(getDepartureLocation(), ride.startPosition)) + ride.distance();
+    freeTime = std::max(ride.earliestStart, currentTime + dist(getDepartureLocation(), ride.startPosition)) + ride.distance();
     rides.push_back(ride);
 }
 
-bool Vehicle::isFree() const
+bool Vehicle::isFree(const unsigned &currentTime) const
 {
-    return freeTime >= currentTime;
+    return freeTime <= currentTime;
 }
 
 bool Vehicle::canComplete(const Ride &ride) const

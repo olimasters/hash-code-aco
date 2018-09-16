@@ -27,9 +27,7 @@ Ant AntColony::findBestAnt()
     for(unsigned i = 0; i < iterations; i++)
     {
         ants.clear();
-
         std::generate_n(std::back_inserter(ants), colonySize, [&](){return Ant(ridesToComplete, pheremoneWeighting, pheremoneMatrix, T, F, B);});
-
         // for(auto &ant : ants)
             // ant.walkToSolution();
         walkAntsToSolutions();

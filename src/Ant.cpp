@@ -16,8 +16,7 @@ Ant::Ant(const std::vector<Ride> &ridesToComplete, double pheremoneWeighting, co
     pheremoneMatrix(pheremoneMatrix),
     rng(std::random_device{}())
 {
-    fleet.reserve(F);
-    std::generate_n(std::back_inserter(fleet), F, [&](){return Vehicle(currentTime);});
+    std::generate_n(std::back_inserter(fleet), F, [](){return Vehicle{};});
 }
 
 unsigned Ant::getScore() const
@@ -36,7 +35,7 @@ std::vector<Vehicle*> Ant::getFreeVehicles()
 {
     std::vector<Vehicle*> freeVehicles;
     for(auto it = fleet.begin(); it != fleet.end(); it++)
-        if(it->isFree())
+        if(it->isFree(currentTime))
             freeVehicles.push_back(&(*it));
     return freeVehicles;
 }
@@ -111,7 +110,7 @@ void Ant::walkToSolution()
             if(vehicle->canCompleteWithBonus(assignedRide))
                 score += B;
 
-            vehicle->assignRide(assignedRide);
+            vehicle->assignRide(assignedRide, currentTime);
         }
     }
 }

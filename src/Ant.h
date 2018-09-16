@@ -16,7 +16,6 @@ class Ant
         Solution getSolution() const;
         PheremoneTrail getPheremoneTrail() const;
         unsigned getScore() const;
-
     private:
         std::vector<Vehicle*> getFreeVehicles();
         std::vector<Ride> getPossibleRides(const Vehicle &vehicle, const std::vector<Ride> &ridesToChooseFrom);

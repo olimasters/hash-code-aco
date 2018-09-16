@@ -4,8 +4,9 @@ file(GLOB_RECURSE sources src/*.cpp src/*.h)
 add_executable(hash-code-aco ${sources})
 
 # One might think that the following would speed things up, but on
-# my machine (i7-4702MQ, g++ 8.2.0 on debian 4.9.11) it in fact slows
-# execution down measurably in all cases.  No idea why.
+# my machine (i7-4702MQ, g++ 8.2.0 on debian stretch, Linux 4.9.11)
+# it in fact slows execution down measurably in all cases.
+# No idea why.
 
 # include(CheckCXXCompilerFlag)
 # CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
